@@ -71,8 +71,6 @@ java -Xmx512m -jar sheepit.jar \\\n\
   -password "${SHEEPIT_PASSWORD}" \\\n\
   -ui oneLine \\\n\
   -compute-method CPU \\\n\
-  -cores ${CORES} \\\n\
-  -memory 256 \\\n\
-  -verbose' > start.sh && chmod +x start.sh
+  -cores ${CORES}' > start.sh && chmod +x start.sh
 
 CMD ["./start.sh"]
