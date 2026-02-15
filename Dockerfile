@@ -96,7 +96,6 @@ java -Xmx512m -jar sheepit.jar \\\n\
   -ui oneLine \\\n\
   -compute-method CPU \\\n\
   -cores ${CORES} \\\n\
-  -memory 512 \\\n\
-  --log-stdout' > start.sh && chmod +x start.sh
+  -memory 512' > start.sh && chmod +x start.sh
 
 CMD ["./start.sh"]
