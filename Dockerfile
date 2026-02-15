@@ -1,9 +1,8 @@
 FROM ubuntu:22.04
 
-# Prevent interactive prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install ALL dependencies for headless Blender rendering
+# Install ALL dependencies for Blender rendering
 RUN apt-get update && \
     apt-get install -y \
     openjdk-21-jre-headless \
@@ -52,19 +51,28 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set software rendering (CRITICAL for CPU-only containers)
+# Set software rendering
 ENV LIBGL_ALWAYS_SOFTWARE=1
 ENV GALLIUM_DRIVER=llvmpipe
 
-# Set working directory
+# Create working directory FIRST
 WORKDIR /app
 
-# Download SheepIt
+# Now download SheepIt (directory exists now)
 RUN wget https://www.sheepit-renderfarm.com/media/applet/client-launcher-jar.php -O sheepit.jar
 
-# Copy start script
-COPY start.sh .
-RUN chmod +x start.sh
+# Create start script directly in Dockerfile
+RUN echo '#!/bin/bash\n\
+CORES=$(nproc)\n\
+if [ $CORES -gt 2 ]; then CORES=2; fi\n\
+echo "Starting SheepIt with $CORES cores..."\n\
+java -Xmx512m -jar sheepit.jar \\\n\
+  -login "${SHEEPIT_LOGIN}" \\\n\
+  -password "${SHEEPIT_PASSWORD}" \\\n\
+  -ui oneLine \\\n\
+  -compute-method CPU \\\n\
+  -cores ${CORES} \\\n\
+  -memory 256 \\\n\
+  -verbose' > start.sh && chmod +x start.sh
 
-# Run SheepIt
 CMD ["./start.sh"]
