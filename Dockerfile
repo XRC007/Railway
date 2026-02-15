@@ -20,11 +20,11 @@ RUN apt-get update && \
 # Set software rendering
 ENV LIBGL_ALWAYS_SOFTWARE=1
 
-# Download SheepIt
-RUN wget https://www.sheepit-renderfarm.com/media/applet/client-launcher-jar.php -O /app/sheepit.jar
-
 # Set working directory
 WORKDIR /app
+
+# Download SheepIt
+RUN wget https://www.sheepit-renderfarm.com/media/applet/client-launcher-jar.php -O /app/sheepit.jar
 
 # Copy start script
 COPY start.sh /app/start.sh
