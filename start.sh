@@ -1,12 +1,19 @@
 #!/bin/bash
 
-# Get number of CPU cores
+# Get number of CPU cores (limit to 2 for Railway free tier)
 CORES=$(nproc)
+if [ $CORES -gt 2 ]; then
+    CORES=2
+fi
 
-# Run SheepIt (Railway will provide environment variables)
-java -jar sheepit.jar \
+echo "Starting SheepIt with $CORES cores..."
+
+# Run SheepIt with memory limit and verbose output
+java -Xmx512m -jar sheepit.jar \
   -login "${SHEEPIT_LOGIN}" \
   -password "${SHEEPIT_PASSWORD}" \
   -ui oneLine \
   -compute-method CPU \
-  -cores ${CORES}
+  -cores ${CORES} \
+  -memory 256 \
+  -verbose
