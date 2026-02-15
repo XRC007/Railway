@@ -37,7 +37,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set software rendering (important for CPU-only rendering)
+# Set software rendering
 ENV LIBGL_ALWAYS_SOFTWARE=1
 
 # Set working directory
