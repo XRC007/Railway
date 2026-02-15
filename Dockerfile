@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install EVERY dependency Blender could possibly need
+# Install all working Blender dependencies
 RUN apt-get update && \
     apt-get install -y \
     openjdk-21-jre-headless \
@@ -66,18 +66,15 @@ RUN apt-get update && \
     libboost-regex1.74.0 \
     libboost-system1.74.0 \
     libboost-thread1.74.0 \
-    libtbb12 \
-    libopenvdb9.1 \
     libblosc1 \
     libpotrace0 \
-    libhpdf-2.3.0 \
     libgmp10 \
     libmpfr6 \
     libxml2 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set software rendering - CRITICAL for CPU-only
+# Set software rendering
 ENV LIBGL_ALWAYS_SOFTWARE=1
 ENV GALLIUM_DRIVER=llvmpipe
 ENV MESA_GL_VERSION_OVERRIDE=3.3
@@ -87,7 +84,7 @@ WORKDIR /app
 # Download SheepIt
 RUN wget https://www.sheepit-renderfarm.com/media/applet/client-launcher-jar.php -O sheepit.jar
 
-# Create start script with debug logging enabled
+# Create start script with logging
 RUN echo '#!/bin/bash\n\
 CORES=$(nproc)\n\
 if [ $CORES -gt 2 ]; then CORES=2; fi\n\
