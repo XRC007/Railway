@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install ALL dependencies for Blender rendering
+# Install EVERY dependency Blender could possibly need
 RUN apt-get update && \
     apt-get install -y \
     openjdk-21-jre-headless \
@@ -14,6 +14,7 @@ RUN apt-get update && \
     libglx-mesa0 \
     libgl1-mesa-dri \
     libglu1-mesa \
+    mesa-utils \
     libxrender1 \
     libxi6 \
     libxrandr2 \
@@ -47,30 +48,58 @@ RUN apt-get update && \
     libxcb-present0 \
     libxcb-sync1 \
     libxshmfence1 \
-    libdrm2 && \
+    libdrm2 \
+    libtbb2 \
+    libfreetype6 \
+    libfontconfig1 \
+    libglib2.0-0 \
+    libharfbuzz0b \
+    libbz2-1.0 \
+    zlib1g \
+    libjemalloc2 \
+    libspnav0 \
+    libopenal1 \
+    libsdl2-2.0-0 \
+    libpugixml1v5 \
+    libboost-filesystem1.74.0 \
+    libboost-locale1.74.0 \
+    libboost-regex1.74.0 \
+    libboost-system1.74.0 \
+    libboost-thread1.74.0 \
+    libtbb12 \
+    libopenvdb9.1 \
+    libblosc1 \
+    libpotrace0 \
+    libhpdf-2.3.0 \
+    libgmp10 \
+    libmpfr6 \
+    libxml2 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set software rendering
+# Set software rendering - CRITICAL for CPU-only
 ENV LIBGL_ALWAYS_SOFTWARE=1
 ENV GALLIUM_DRIVER=llvmpipe
+ENV MESA_GL_VERSION_OVERRIDE=3.3
 
-# Create working directory FIRST
 WORKDIR /app
 
-# Now download SheepIt (directory exists now)
+# Download SheepIt
 RUN wget https://www.sheepit-renderfarm.com/media/applet/client-launcher-jar.php -O sheepit.jar
 
-# Create start script directly in Dockerfile
+# Create start script with debug logging enabled
 RUN echo '#!/bin/bash\n\
 CORES=$(nproc)\n\
 if [ $CORES -gt 2 ]; then CORES=2; fi\n\
 echo "Starting SheepIt with $CORES cores..."\n\
+echo "Available memory: $(free -h | grep Mem)"\n\
 java -Xmx512m -jar sheepit.jar \\\n\
   -login "${SHEEPIT_LOGIN}" \\\n\
   -password "${SHEEPIT_PASSWORD}" \\\n\
   -ui oneLine \\\n\
   -compute-method CPU \\\n\
-  -cores ${CORES}' > start.sh && chmod +x start.sh
+  -cores ${CORES} \\\n\
+  -memory 512 \\\n\
+  --log-stdout' > start.sh && chmod +x start.sh
 
 CMD ["./start.sh"]
